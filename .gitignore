@@ -103,3 +103,10 @@ ENV/
 .project
 .pydevproject
 */output.log
+
+# AWS
+*.csv
+aws/
+
+# ObjectStores
+ObjectStores/*.txt
