@@ -64,7 +64,7 @@ class S3Handler:
             # traceback.print_exc(file=sys.stdout)
             
             response_code = e.response['Error']['Code']
-            if response_code == '404':
+            if response_code in ['400', '403', '404']:
                 return False
             elif response_code == '200':
                 return True
@@ -85,7 +85,6 @@ class S3Handler:
             self.client.create_bucket(Bucket=bucket_name,
                                       CreateBucketConfiguration={'LocationConstraint': REGION})
         except Exception as e:
-            print(e)
             raise e
 
         # Success response
@@ -93,10 +92,13 @@ class S3Handler:
         return operation_successful
     
     def listdir(self, bucket_name=None):
+        response = self.client.list_buckets()
+        buckets = [bucket['Name'] for bucket in response['Buckets']]
+        
         # If bucket_name is provided,
         if bucket_name:
-            # check that bucket exits
-            if not self._get(bucket_name):
+            # check that bucket exists
+            if bucket_name not in buckets:
                 return self._error_messages('non_existent_bucket')
             else:
                 # display the names of all objects in the bucket
@@ -108,8 +110,6 @@ class S3Handler:
                     return [obj['Key'] for obj in contents]
         # If bucket_name is empty then display the names of all the buckets
         else:
-            response = self.client.list_buckets()
-            buckets = [bucket['Name'] for bucket in response['Buckets']]
             return buckets
 
     def upload(self, source_file_name, bucket_name, dest_object_name=None):

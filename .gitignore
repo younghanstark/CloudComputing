@@ -110,3 +110,4 @@ aws/
 
 # ObjectStores
 ObjectStores/*.txt
+ObjectStores/*.bak
